@@ -16,9 +16,9 @@ public class BoidWorld extends World
     public BoidWorld()
     {    
         // Create a new world with 600x400 cells with a cell size of 1x1 pixels.
-        super(600, 600, 1, false);
-        for(int i = 0; i < 50; i++){
-            addObject(new Boid(),Greenfoot.getRandomNumber(500),Greenfoot.getRandomNumber(500));
+        super(1000, 1000, 1, false);
+        for(int i = 0; i < 500; i++){
+            addObject(new Boid(),Greenfoot.getRandomNumber(1000),Greenfoot.getRandomNumber(1000));
         }
     }
 }

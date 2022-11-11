@@ -15,7 +15,7 @@ public abstract class SmoothMover extends Actor
 {
     private double exactX;
     private double exactY;
-
+    
     /**
      * Move forward by the specified distance.
      * (Overrides the method in Actor).

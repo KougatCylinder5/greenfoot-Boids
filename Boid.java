@@ -9,7 +9,7 @@ import java.util.*;
  */
 public class Boid extends SmoothMover
 {
-    private double angle,speed;
+    private double angle,speed = 5;
     
     public void Boid(double speed, double angle){
         this.angle = angle;
@@ -22,16 +22,24 @@ public class Boid extends SmoothMover
     }
     public void act()
     {
-        if(getX() > 50 && getX() < 550 && getY() > 50 && getY() < 550)
+        if(getX() > 100 && getX() < 900 && getY() > 100 && getY() < 900){
             cohesion();
             speed();
-            alignment();
-            seperation();
+            accum(seperation(),alignment());
+        }else{
+            accumMove();
+        }
         borderless();
-        accumMove();
+        
+    }
+    public void accum(List sep, double ali){
+        move((double)(sep.get(0)));
+        this.speed = (double)sep.get(0);
+        turn((int)(double)sep.get(1) + (int)ali);
+        System.out.println((double)sep.get(1));
     }
     public void cohesion(){
-        List nearBoids = getObjectsInRange(150,Boid.class);
+        List nearBoids = getObjectsInRange(25,Boid.class);
         if(!nearBoids.isEmpty()){
             int aX = 0,aY = 0;
             for(int i = 0; i < nearBoids.size(); i++){
@@ -48,8 +56,8 @@ public class Boid extends SmoothMover
     public void speed(){
     
     }
-    public void alignment(){
-        List nearBoids = getObjectsInRange(125,Boid.class);
+    public double alignment(){
+        List nearBoids = getObjectsInRange(150,Boid.class);
         if(!nearBoids.isEmpty()){
             double aAngle = 0.0;
             for(int i = 0; i < nearBoids.size(); i++){
@@ -58,11 +66,12 @@ public class Boid extends SmoothMover
             aAngle /= nearBoids.size();
             aAngle -= getRotation();
             aAngle = aAngle > 0 ? (aAngle > 5 ? 5 : aAngle) : (aAngle < -5 ? -5 : aAngle);
-            
-            setRotation(getRotation() + (int)aAngle);
+            //setRotation(getRotation() + (int)aAngle);
+            return aAngle + (Greenfoot.getRandomNumber(3)-2) * 0.5;
         }
+        return Greenfoot.getRandomNumber(3)-2;
     }
-    public void seperation(){
+    public List seperation(){
         List nearBoids = getObjectsInRange(25,Boid.class);
         if(!nearBoids.isEmpty()){
             int aX = 0,aY = 0;
@@ -76,34 +85,35 @@ public class Boid extends SmoothMover
             aX /= nearBoids.size();
             aY /= nearBoids.size();
             
-            try{
-                m = (getExactY() - aY)/(getExactX() - aX);
-            }catch(ArithmeticException e){
-                m = 0;
-            }
-            double dX =(getX()-aX)/2;
-            dX = dX > 0 ? (dX > 1 ? 1 : dX) : (dX < -1 ? -1 : dX);
-            double dY = (getY()-aY)/2;
-            dY = dY > 0 ? (dY > 1 ? 1 : dY) : (dY < -1 ? -1 : dY);
-            setLocation(getExactX() + dX,getExactY() + dY);
-            
+            int curAngle = getRotation();
+            turnTowards(aX,aY);
+            int rotation = getRotation();       
+            // double dX =(getX()-aX)/2;
+            // dX = dX > 0 ? (dX > 1 ? 1 : dX) : (dX < -1 ? -1 : dX);
+            // double dY = (getY()-aY)/2;
+            // dY = dY > 0 ? (dY > 1 ? 1 : dY) : (dY < -1 ? -1 : dY);
+            // setLocation(getExactX() + dX,getExactY() + dY);
+            //speed,angle
+            setRotation(curAngle);
+            return Arrays.asList(Math.abs(curAngle-rotation) > 90 ? 2.7 : 2.3,curAngle-rotation > 0 ? curAngle - rotation < 5 ? curAngle - rotation : 5.0 : curAngle - rotation > -5 ? curAngle - rotation : -5.0);
         }
+        return Arrays.asList(this.speed,0.0);
     }
     public void borderless(){
         if(getX() < 25){
-            setLocation(574,getExactY());
-        }else if(getX() > 575){
+            setLocation(1074,getExactY());
+        }else if(getX() > 1075){
             setLocation(26,getExactY());
         }
         if(getY() < 25){
-            setLocation(getExactX(),574);
-        }else if(getY() > 575){
+            setLocation(getExactX(),974);
+        }else if(getY() > 975){
             setLocation(getExactX(),26);
         }
         
     }
     public void accumMove(){
-        move(2.5);
+        move(this.speed);
     }
     public double getSpeed(){
         return speed;
