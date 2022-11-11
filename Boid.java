@@ -22,23 +22,21 @@ public class Boid extends SmoothMover
     }
     public void act()
     {
-        if(getX() > 100 && getX() < 900 && getY() > 100 && getY() < 900){
-            cohesion();
-            speed();
-            accum(seperation(),alignment());
-        }else{
-            accumMove();
-        }
+        //if(){
+            
+            accum(seperation(),alignment(),cohesion());
+        //}else{
+        //    accumMove();
+        //}
         borderless();
         
     }
-    public void accum(List sep, double ali){
+    public void accum(List sep, double ali, double coh){
         move((double)(sep.get(0)));
         this.speed = (double)sep.get(0);
-        turn((int)(double)sep.get(1) + (int)ali);
-        System.out.println((double)sep.get(1));
+        turn((int)(double)sep.get(1) + (int)ali + (int)coh);
     }
-    public void cohesion(){
+    public double cohesion(){
         List nearBoids = getObjectsInRange(25,Boid.class);
         if(!nearBoids.isEmpty()){
             int aX = 0,aY = 0;
@@ -51,10 +49,14 @@ public class Boid extends SmoothMover
             aX /= nearBoids.size();
             aY /= nearBoids.size();
             
+            int curAngle = getRotation();
+            turnTowards(aX,aY);
+            int rotation = getRotation();    
+            setRotation(curAngle);
+            rotation -= curAngle;
+            return 0;
         }
-    }
-    public void speed(){
-    
+        return 0;
     }
     public double alignment(){
         List nearBoids = getObjectsInRange(150,Boid.class);
@@ -66,10 +68,9 @@ public class Boid extends SmoothMover
             aAngle /= nearBoids.size();
             aAngle -= getRotation();
             aAngle = aAngle > 0 ? (aAngle > 5 ? 5 : aAngle) : (aAngle < -5 ? -5 : aAngle);
-            //setRotation(getRotation() + (int)aAngle);
-            return aAngle + (Greenfoot.getRandomNumber(3)-2) * 0.5;
+            return aAngle;
         }
-        return Greenfoot.getRandomNumber(3)-2;
+        return 0;
     }
     public List seperation(){
         List nearBoids = getObjectsInRange(25,Boid.class);
@@ -88,11 +89,6 @@ public class Boid extends SmoothMover
             int curAngle = getRotation();
             turnTowards(aX,aY);
             int rotation = getRotation();       
-            // double dX =(getX()-aX)/2;
-            // dX = dX > 0 ? (dX > 1 ? 1 : dX) : (dX < -1 ? -1 : dX);
-            // double dY = (getY()-aY)/2;
-            // dY = dY > 0 ? (dY > 1 ? 1 : dY) : (dY < -1 ? -1 : dY);
-            // setLocation(getExactX() + dX,getExactY() + dY);
             //speed,angle
             setRotation(curAngle);
             return Arrays.asList(Math.abs(curAngle-rotation) > 90 ? 2.7 : 2.3,curAngle-rotation > 0 ? curAngle - rotation < 5 ? curAngle - rotation : 5.0 : curAngle - rotation > -5 ? curAngle - rotation : -5.0);
